@@ -323,7 +323,6 @@ func (r *router) Route(req *http.Request) (*api.Service, error) {
 			Name: name,
 			Endpoint: &api.Endpoint{
 				Name:    method,
-				Handler: api.Api,
 			},
 			Services: services,
 		}, nil

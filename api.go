@@ -2,6 +2,7 @@ package api
 
 import (
 	"errors"
+	// "github.com/micro/go-api/handler/rpc"
 	"regexp"
 	"strings"
 
@@ -141,4 +142,132 @@ func NewGateway() Gateway {
 //	))
 func WithEndpoint(e *Endpoint) server.HandlerOption {
 	return server.EndpointMetadata(e.Name, Encode(e))
+}
+
+const (
+	RPCHANDLER = "rpc"
+)
+// POST returns a server.HandlerOption with endpoint metadata set
+//
+// Usage:
+//
+// 	proto.RegisterHandler(service.Server(), new(Handler),
+//   api.POST("/greeter/", "Greeter.Hello"),
+//   api.GET("/greeter/", "Greeter.Hello")
+// )
+func POST(path string, name string) server.HandlerOption{
+	return WithEndpoint(&Endpoint{
+		Name: name,
+		Path: []string{path},
+		Method: []string{"POST"},
+		Handler: RPCHANDLER,
+	})
+}
+
+// PATCH returns a server.HandlerOption with endpoint metadata set
+//
+// Usage:
+//
+// 	proto.RegisterHandler(service.Server(), new(Handler), api.PATCH("/greeter/", "Greeter.Hello"))
+func PATCH(path string, name string) server.HandlerOption{
+	return WithEndpoint(&Endpoint{
+		Name: name,
+		Path: []string{path},
+		Method: []string{"PATCH"},
+		Handler: RPCHANDLER,
+	})
+}
+
+// PUT returns a server.HandlerOption with endpoint metadata set
+//
+// Usage:
+//
+// 	proto.RegisterHandler(service.Server(), new(Handler), api.PUT"/greeter/", "Greeter.Hello"))
+func PUT(path string, name string) server.HandlerOption{
+	return WithEndpoint(&Endpoint{
+		Name: name,
+		Path: []string{path},
+		Method: []string{"PUT"},
+		Handler: RPCHANDLER,
+	})
+}
+
+// GET returns a server.HandlerOption with endpoint metadata set
+//
+// Usage:
+//
+// proto.RegisterHandler(service.Server(), new(Handler), api.GET("/greeter/", "Greeter.Hello"))
+func GET(path string, name string) server.HandlerOption{
+	return WithEndpoint(&Endpoint{
+		Name: name,
+		Path: []string{path},
+		Method: []string{"GET"},
+		Handler: RPCHANDLER,
+	})
+}
+
+// DELETE returns a server.HandlerOption with endpoint metadata set
+//
+// Usage:
+//
+// 	proto.RegisterHandler(service.Server(), new(Handler), api.DELETE("/greeter/", "Greeter.Hello"))
+func DELETE(path string, name string) server.HandlerOption{
+	return WithEndpoint(&Endpoint{
+		Name: name,
+		Path: []string{path},
+		Method: []string{"DELETE"},
+		Handler: RPCHANDLER,
+	})
+}
+
+// HttpHandlers are used for listing server.HandlerOptions with endpoint metadata sets.
+//
+// Usage:
+//
+//  r:= NewHttpRouters()
+//  r.POST("/greeter/", "Greeter.Hello")
+//  r.PATCH(...)
+//  ...
+//  proto.RegisterHandler(service.Server(), new(Handler), r...)
+type HttpHandlers []server.HandlerOption
+
+func NewHttpRouters() HttpHandlers {
+	r := make([]server.HandlerOption,0)
+	return r
+}
+
+func (r *HttpHandlers) POST(path string, name string) {
+	if r == nil {
+		*r = make([]server.HandlerOption,0)
+	}
+	*r = append(*r, POST(path,name))
+}
+
+
+func (r *HttpHandlers) GET(path string, name string) {
+	if r == nil {
+		*r = make([]server.HandlerOption,0)
+	}
+	*r = append(*r, GET(path,name))
+}
+
+func (r *HttpHandlers) PUT(path string, name string) {
+	if r == nil {
+		*r = make([]server.HandlerOption,0)
+	}
+	*r = append(*r, PUT(path,name))
+}
+
+func (r *HttpHandlers) PATCH(path string, name string) {
+	if r == nil {
+		*r = make([]server.HandlerOption,0)
+	}
+	*r = append(*r, PATCH(path,name))
+}
+
+func (r *HttpHandlers) DELETE(path string, name string) {
+	if r == nil {
+		*r = make([]server.HandlerOption,0)
+	}
+	*r = append(*r, DELETE(path,name))
 }

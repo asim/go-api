@@ -134,7 +134,7 @@ func NewGateway() Gateway {
 //
 // Usage:
 //
-// 	proto.RegisterHandler(service.Server(), new(Handler), api.WithEndpoint(
+//  proto.RegisterHandler(service.Server(), new(Handler), api.WithEndpoint(
 //		&api.Endpoint{
 //			Name: "Greeter.Hello",
 //			Path: []string{"/greeter"},
@@ -151,10 +151,9 @@ const (
 //
 // Usage:
 //
-// 	proto.RegisterHandler(service.Server(), new(Handler),
-//   api.POST("/greeter/", "Greeter.Hello"),
-//   api.GET("/greeter/", "Greeter.Hello")
-// )
+//  proto.RegisterHandler(service.Server(), new(Handler),
+//	  api.POST("/greeter/", "Greeter.Hello"),
+//	  api.GET("/greeter/", "Greeter.Hello")
 func POST(path string, name string) server.HandlerOption{
 	return WithEndpoint(&Endpoint{
 		Name: name,
@@ -168,7 +167,7 @@ func POST(path string, name string) server.HandlerOption{
 //
 // Usage:
 //
-// 	proto.RegisterHandler(service.Server(), new(Handler), api.PATCH("/greeter/", "Greeter.Hello"))
+//  proto.RegisterHandler(service.Server(), new(Handler), api.PATCH("/greeter/", "Greeter.Hello"))
 func PATCH(path string, name string) server.HandlerOption{
 	return WithEndpoint(&Endpoint{
 		Name: name,
@@ -182,7 +181,7 @@ func PATCH(path string, name string) server.HandlerOption{
 //
 // Usage:
 //
-// 	proto.RegisterHandler(service.Server(), new(Handler), api.PUT"/greeter/", "Greeter.Hello"))
+//  proto.RegisterHandler(service.Server(), new(Handler), api.PUT"/greeter/", "Greeter.Hello"))
 func PUT(path string, name string) server.HandlerOption{
 	return WithEndpoint(&Endpoint{
 		Name: name,
@@ -196,7 +195,7 @@ func PUT(path string, name string) server.HandlerOption{
 //
 // Usage:
 //
-// proto.RegisterHandler(service.Server(), new(Handler), api.GET("/greeter/", "Greeter.Hello"))
+//  proto.RegisterHandler(service.Server(), new(Handler), api.GET("/greeter/", "Greeter.Hello"))
 func GET(path string, name string) server.HandlerOption{
 	return WithEndpoint(&Endpoint{
 		Name: name,

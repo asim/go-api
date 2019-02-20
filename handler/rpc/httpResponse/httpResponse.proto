@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+message HttpResponse {
+    int32 statusCode = 1;
+    map<string, Pair> header = 2;
+    string body = 3;
+}
+message Pair {
+	string key = 1;
+	repeated string values = 2;
+}
+
+message Wrap {
+    HttpResponse httpResponse = 1;
+}

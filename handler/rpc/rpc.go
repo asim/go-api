@@ -3,6 +3,7 @@ package rpc
 
 import (
 	"encoding/json"
+	httpResponse2 "github.com/micro/go-api/handler/rpc/httpResponse"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -12,7 +13,7 @@ import (
 	"github.com/joncalhoun/qson"
 	"github.com/micro/go-api"
 	"github.com/micro/go-api/handler"
-	proto "github.com/micro/go-api/internal/proto"
+	"github.com/micro/go-api/internal/proto"
 	"github.com/micro/go-micro/client"
 	"github.com/micro/go-micro/codec"
 	"github.com/micro/go-micro/codec/jsonrpc"
@@ -21,6 +22,7 @@ import (
 	"github.com/micro/go-micro/registry"
 	"github.com/micro/go-micro/selector"
 	"github.com/micro/util/go/lib/ctx"
+	proto2 "golang.org/x/protobuf/proto"
 )
 
 const (
@@ -89,12 +91,15 @@ func (h *rpcHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// only allow post when we have the router
-	if r.Method != "GET" && (h.opts.Router != nil && r.Method != "POST") {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
+	//if r.Method != "GET" && (h.opts.Router != nil && r.Method != "POST") {
+	//	http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	//	return
+	//}
 
 	ct := r.Header.Get("Content-Type")
+	if ct == "" {
+		ct = "application/json"
+	}
 
 	// Strip charset from Content-Type (like `application/json; charset=UTF-8`)
 	if idx := strings.IndexRune(ct, ';'); idx >= 0 {
@@ -118,6 +123,8 @@ func (h *rpcHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	cx := ctx.FromRequest(r)
 
 	var rsp []byte
+
+	var httpResponseWrapper = &httpResponse2.Wrap{}
 
 	switch {
 	// json codecs
@@ -146,7 +153,12 @@ func (h *rpcHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 		// marshall response
 		rsp, _ = response.MarshalJSON()
-	// proto codecs
+		if e := json.Unmarshal(rsp, httpResponseWrapper); e != nil {
+			writeError(w, r, e)
+			return
+		}
+
+		// proto codecs
 	case hasCodec(ct, protoCodecs):
 		request := &proto.Message{}
 		// if the extracted payload isn't empty lets use it
@@ -172,11 +184,23 @@ func (h *rpcHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 		// marshall response
 		rsp, _ = response.Marshal()
+		if e := proto2.Unmarshal(rsp, httpResponseWrapper); e != nil {
+			writeError(w, r, e)
+			return
+		}
+
 	default:
 		http.Error(w, "Unsupported Content-Type", 400)
 		return
 	}
 
+	// Whether handle http response writer's status code and its body.
+	// Only when httpResponseWrapper is not nil and its status code != 200,
+	// the status code and its body will be write to writer.
+	if httpResponseWrapper != nil && httpResponseWrapper.HttpResponse.StatusCode != 200 {
+		http.Error(w, httpResponseWrapper.HttpResponse.Body, int(httpResponseWrapper.HttpResponse.StatusCode))
+		return
+	}
 	// write the response
 	writeResponse(w, r, rsp)
 }
@@ -243,7 +267,7 @@ func requestPayload(r *http.Request) ([]byte, error) {
 		return ioutil.ReadAll(r.Body)
 	}
 
-	return []byte{}, nil
+	return []byte(""), nil
 }
 
 func writeError(w http.ResponseWriter, r *http.Request, err error) {

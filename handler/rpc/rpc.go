@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 
+	proto2 "github.com/golang/protobuf/proto"
 	"github.com/joncalhoun/qson"
 	"github.com/micro/go-api"
 	"github.com/micro/go-api/handler"
@@ -22,7 +23,6 @@ import (
 	"github.com/micro/go-micro/registry"
 	"github.com/micro/go-micro/selector"
 	"github.com/micro/util/go/lib/ctx"
-	proto2 "golang.org/x/protobuf/proto"
 )
 
 const (

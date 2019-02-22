@@ -105,7 +105,7 @@ func (r *registryRouter) process(res *registry.Result) {
 	}
 
 	// get entry from cache
-	service, err := r.rc.GetService(res.Service.Name)
+	service, err := r.opts.Registry.GetService(res.Service.Name)
 	if err != nil {
 		return
 	}

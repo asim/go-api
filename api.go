@@ -44,7 +44,7 @@ func slice(s string) []string {
 
 	for _, p := range strings.Split(s, ",") {
 		if str := strip(p); len(str) > 0 {
-			sl = append(sl, strip(p))
+			sl = append(sl, str)
 		}
 	}
 
